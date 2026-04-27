@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/IndraSty/payment-aggregator-golang/internal/domain"
+	"github.com/IndraSty/payment-aggregator-golang/pkg/metrics"
 	"github.com/IndraSty/payment-aggregator-golang/pkg/validator"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -83,8 +84,12 @@ func (u *chargeUsecase) CreateCharge(ctx context.Context, input *domain.CreateCh
 	}
 
 	// Step 5: Call provider
+	start := time.Now()
 	chargeResp, err := providerClient.Charge(ctx, chargeReq)
+	duration := time.Since(start).Seconds()
+
 	if err != nil {
+		metrics.RecordCharge(string(providerClient.Name()), input.Currency, "failed", duration)
 		log.Error().
 			Err(err).
 			Str("provider", string(providerClient.Name())).
@@ -92,6 +97,8 @@ func (u *chargeUsecase) CreateCharge(ctx context.Context, input *domain.CreateCh
 			Msg("Provider charge failed")
 		return nil, domain.ErrServiceUnavailable(string(providerClient.Name()))
 	}
+
+	metrics.RecordCharge(string(providerClient.Name()), input.Currency, "success", duration)
 
 	// Step 6: Persist the transaction
 	userID, err := uuid.Parse(input.UserID)
