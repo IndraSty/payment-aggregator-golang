@@ -53,3 +53,19 @@ var (
 func Handler() http.Handler {
 	return promhttp.Handler()
 }
+
+// RecordCharge records a charge attempt result to Prometheus.
+func RecordCharge(provider, currency, status string, durationSeconds float64) {
+	ChargeTotal.WithLabelValues(provider, currency, status).Inc()
+	ChargeLatency.WithLabelValues(provider).Observe(durationSeconds)
+}
+
+// RecordWebhook records an incoming webhook to Prometheus.
+func RecordWebhook(provider, eventType string) {
+	WebhookTotal.WithLabelValues(provider, eventType).Inc()
+}
+
+// RecordReconciliationDiscrepancy records a reconciliation discrepancy.
+func RecordReconciliationDiscrepancy(provider string) {
+	ReconciliationDiscrepancies.WithLabelValues(provider).Inc()
+}
