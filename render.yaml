@@ -1,0 +1,70 @@
+services:
+  - type: web
+    name: payment-aggregator
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: payment-aggregator
+      - key: APP_ENV
+        value: production
+      - key: APP_PORT
+        value: 8080
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRY
+        value: 15m
+      - key: JWT_REFRESH_EXPIRY
+        value: 168h
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_MAX_OPEN_CONNS
+        value: 10
+      - key: DATABASE_MAX_IDLE_CONNS
+        value: 3
+      - key: DATABASE_CONN_MAX_LIFETIME
+        value: 5m
+      - key: REDIS_URL
+        sync: false
+      - key: REDIS_IDEMPOTENCY_TTL
+        value: 24h
+      - key: REDIS_RATE_LIMIT_WINDOW
+        value: 1m
+      - key: RATE_LIMIT_PER_IP
+        value: 60
+      - key: RATE_LIMIT_PER_API_KEY
+        value: 1000
+      - key: MIDTRANS_SERVER_KEY
+        sync: false
+      - key: MIDTRANS_CLIENT_KEY
+        sync: false
+      - key: MIDTRANS_IS_PRODUCTION
+        value: false
+      - key: XENDIT_SECRET_KEY
+        sync: false
+      - key: XENDIT_CALLBACK_TOKEN
+        sync: false
+      - key: XENDIT_IS_PRODUCTION
+        value: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_IS_PRODUCTION
+        value: false
+      - key: CB_MAX_REQUESTS
+        value: 5
+      - key: CB_INTERVAL
+        value: 60s
+      - key: CB_TIMEOUT
+        value: 30s
+      - key: CB_FAILURE_RATIO
+        value: 0.6
+      - key: RECONCILE_CRON_SCHEDULE
+        value: 0 2 * * *
+      - key: RECONCILE_LOOKBACK_HOURS
+        value: 24
+      - key: PROMETHEUS_ENABLED
+        value: true
