@@ -55,7 +55,7 @@ func IdempotencyCheck(idempotencyRepo domain.IdempotencyRepository) echo.Middlew
 			c.Set("idempotency_key", key)
 
 			// Wrap the response writer to capture the response body for caching
-			crw := newCapturingResponseWriter(c.Response())
+			crw := newCapturingResponseWriter(c.Response().Writer)
 			c.Response().Writer = crw
 
 			if err := next(c); err != nil {
@@ -80,27 +80,27 @@ func IdempotencyCheck(idempotencyRepo domain.IdempotencyRepository) echo.Middlew
 
 // capturingResponseWriter wraps echo.Response to capture the body and status.
 type capturingResponseWriter struct {
-	*echo.Response
+	http.ResponseWriter
 	body   *bytes.Buffer
 	status int
 }
 
-func newCapturingResponseWriter(resp *echo.Response) *capturingResponseWriter {
+func newCapturingResponseWriter(w http.ResponseWriter) *capturingResponseWriter {
 	return &capturingResponseWriter{
-		Response: resp,
-		body:     &bytes.Buffer{},
-		status:   http.StatusOK,
+		ResponseWriter: w,
+		body:           &bytes.Buffer{},
+		status:         http.StatusOK,
 	}
 }
 
 func (crw *capturingResponseWriter) WriteHeader(code int) {
 	crw.status = code
-	crw.Response.WriteHeader(code)
+	crw.ResponseWriter.WriteHeader(code)
 }
 
 func (crw *capturingResponseWriter) Write(b []byte) (int, error) {
 	crw.body.Write(b)
-	return crw.Response.Write(b)
+	return crw.ResponseWriter.Write(b)
 }
 
 // isValidJSON checks if bytes are valid JSON — safety check before caching.
