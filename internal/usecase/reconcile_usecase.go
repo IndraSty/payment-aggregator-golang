@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/IndraSty/payment-aggregator-golang/internal/domain"
+	"github.com/IndraSty/payment-aggregator-golang/pkg/metrics"
 	"github.com/IndraSty/payment-aggregator-golang/pkg/validator"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -133,6 +134,7 @@ func (u *reconcileUsecase) reconcileProvider(ctx context.Context, providerName d
 				logger.Error().Err(err).Str("transaction_id", tx.ID.String()).Msg("Failed to write reconciliation audit log")
 			}
 
+			metrics.RecordReconciliationDiscrepancy(string(providerName))
 			discrepancies++
 			logger.Info().
 				Str("transaction_id", tx.ID.String()).
