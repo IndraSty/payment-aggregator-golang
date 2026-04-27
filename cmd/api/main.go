@@ -1,3 +1,27 @@
+// @title           Payment Aggregator API
+// @version         1.0
+// @description     Unified payment middleware supporting Midtrans, Xendit, and Stripe.
+// @description     Routes payments automatically based on currency (IDR → Midtrans/Xendit, USD/EUR → Stripe).
+
+// @contact.name    Indra Sty
+// @contact.url     https://github.com/IndraSty
+// @contact.email   your@email.com
+
+// @license.name    MIT
+// @license.url     https://opensource.org/licenses/MIT
+
+// @host            localhost:8080
+// @BasePath        /
+
+// @securityDefinitions.apikey BearerAuth
+// @in              header
+// @name            Authorization
+// @description     Format: "Bearer {token}"
+
+// @securityDefinitions.apikey APIKeyAuth
+// @in              header
+// @name            X-API-Key
+
 package main
 
 import (
@@ -21,6 +45,7 @@ import (
 	"github.com/IndraSty/payment-aggregator-golang/pkg/circuitbreaker"
 	"github.com/IndraSty/payment-aggregator-golang/pkg/database"
 	"github.com/IndraSty/payment-aggregator-golang/pkg/logger"
+	"github.com/IndraSty/payment-aggregator-golang/pkg/scheduler"
 	"github.com/rs/zerolog/log"
 )
 
@@ -89,6 +114,14 @@ func main() {
 	chargeUC := usecase.NewChargeUsecase(transactionRepo, auditRepo, idempotencyRepo, providerRouter)
 	webhookUC := usecase.NewWebhookUsecase(transactionRepo, auditRepo, webhookRepo, providerRouter)
 	reconcileUC := usecase.NewReconcileUsecase(transactionRepo, auditRepo, reconcileRepo, providerRouter, cfg.Reconcile.LookbackHours)
+
+	sched := scheduler.New(reconcileUC)
+	if err := sched.Register(cfg.Reconcile.CronSchedule); err != nil {
+		log.Fatal().Err(err).Msg("Failed to register cron jobs")
+		os.Exit(1)
+	}
+	sched.Start()
+	defer sched.Stop()
 
 	// HTTP Router
 	router := deliveryhttp.NewRouter(&deliveryhttp.RouterDeps{
