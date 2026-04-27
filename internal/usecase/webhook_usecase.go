@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/IndraSty/payment-aggregator-golang/internal/domain"
+	"github.com/IndraSty/payment-aggregator-golang/pkg/metrics"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
@@ -60,6 +61,8 @@ func (u *webhookUsecase) process(ctx context.Context, providerName domain.Paymen
 		logger.Warn().Err(err).Msg("Webhook signature verification failed")
 		return domain.NewAppError(401, "webhook signature verification failed", err)
 	}
+
+	metrics.RecordWebhook(string(providerName), webhookPayload.EventType)
 
 	// Step 3: Replay attack prevention — check if already processed
 	alreadyProcessed, err := u.webhookRepo.ExistsByEventType(ctx, providerName, webhookPayload.EventType+":"+webhookPayload.ExternalID)
