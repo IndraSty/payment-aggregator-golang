@@ -11,6 +11,9 @@ import (
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
+	echoswagger "github.com/swaggo/echo-swagger"
+
+	_ "github.com/IndraSty/payment-aggregator-golang/docs"
 )
 
 // RouterDeps holds all dependencies needed to set up routes.
@@ -71,6 +74,11 @@ func NewRouter(deps *RouterDeps) *echo.Echo {
 	// -------------------------------------------------------------------------
 	e.GET("/health", healthHandler.Health)
 	e.GET("/metrics", echo.WrapHandler(metrics.Handler()))
+
+	// Swagger UI — only available in non-production
+	if !deps.Config.IsProduction() {
+		e.GET("/swagger/*", echoswagger.WrapHandler)
+	}
 
 	// Auth routes — IP rate limited only
 	auth := e.Group("/api/v1/auth")
