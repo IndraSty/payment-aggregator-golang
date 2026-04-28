@@ -46,6 +46,59 @@ Client → Payment Aggregator → Midtrans  (IDR)
 
 ## 🏗️ Architecture
 
+### Service Architecture
+
+How the system fits together end-to-end — from client request to payment provider and back.
+
+```
+                      ┌─────────────┐
+                      │   Client    │
+                      └──────┬──────┘
+                             │ HTTPS Request
+                             │ + X-Idempotency-Key
+                             │ + Authorization: Bearer
+                      ┌──────▼───────────────────────┐
+                      │     Payment Aggregator        │
+                      │                               │
+                      │  ┌─────────────────────────┐  │
+                      │  │     JWT Middleware       │  │
+                      │  │     Rate Limiter         │  │
+                      │  │     Idempotency Check    │  │
+                      │  └────────────┬────────────┘  │
+                      │               │                │
+                      │  ┌────────────▼────────────┐  │
+                      │  │     Provider Router      │  │
+                      │  │  (currency-based routing)│  │
+                      │  └──┬──────────┬─────────┬─┘  │
+                      └─────┼──────────┼─────────┼────┘
+                            │          │         │
+                   IDR ─────┘    IDR ──┘   USD/EUR
+                   (primary)  (fallback)   (only)
+                            │          │         │
+                   ┌────────▼───┐ ┌────▼────┐ ┌─▼──────┐
+                   │  Midtrans  │ │ Xendit  │ │ Stripe │
+                   │  Sandbox   │ │ Sandbox │ │  Test  │
+                   └────────┬───┘ └────┬────┘ └─┬──────┘
+                            │          │         │
+                            └──────────┼─────────┘
+                                       │ Webhook Callback
+                      ┌────────────────▼──────────────┐
+                      │        Payment Aggregator      │
+                      │    (webhook handler layer)     │
+                      └────────────────┬───────────────┘
+                                       │
+                      ┌────────────────▼───────────────┐
+                      │          Storage Layer          │
+                      │                                 │
+                      │  ┌─────────────┐ ┌──────────┐  │
+                      │  │ PostgreSQL  │ │  Redis   │  │
+                      │  │ (Neon.tech) │ │(Upstash) │  │
+                      │  └─────────────┘ └──────────┘  │
+                      └─────────────────────────────────┘
+```
+
+### Code Architecture
+
 This project follows **Clean Architecture** with 4 strict layers. Dependencies only flow inward — the domain layer knows nothing about the outside world.
 
 ```
@@ -104,7 +157,7 @@ payment-aggregator/
 
 ### Prerequisites
 
-- Go 1.23+
+- Go 1.26+
 - [Neon.tech](https://neon.tech) account (free PostgreSQL)
 - [Upstash](https://upstash.com) account (free Redis)
 - Midtrans Sandbox account
