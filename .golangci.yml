@@ -1,0 +1,30 @@
+run:
+  timeout: 5m
+  go: '1.26'
+
+linters:
+  enable:
+    - errcheck       # check error handling
+    - gosimple       # simplification suggestions
+    - govet          # correctness checks
+    - ineffassign    # detect ineffectual assignments
+    - staticcheck    # static analysis
+    - unused         # detect unused code
+    - gofmt          # formatting
+    - misspell       # spelling mistakes
+    - godot          # comment punctuation
+
+linters-settings:
+  errcheck:
+    ignore: fmt:.*,io/ioutil:.*
+
+issues:
+  exclude-rules:
+    # Ignore errors in test files
+    - path: _test\.go
+      linters:
+        - errcheck
+    # Ignore long lines in migration files
+    - path: migrations/
+      linters:
+        - all
