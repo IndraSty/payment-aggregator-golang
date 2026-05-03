@@ -2,7 +2,7 @@ run:
   timeout: 5m
   go: '1.26'
 
-linters:
+formatters:
   enable:
     - errcheck
     - gosimple
@@ -14,17 +14,19 @@ linters:
     - misspell
     - godot
 
-linters-settings:
-  errcheck:
-    exclude-functions:
-      - fmt.*
-      - io/ioutil.*
+linters:
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.*
+        - io/ioutil.*
 
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
-    - path: migrations/
-      linters:
-        - all
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+      - path: migrations/
+        linters:
+          - all
