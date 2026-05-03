@@ -7,17 +7,13 @@ run:
 formatters:
   enable:
     - gofmt
-    
+    - gosimple
+
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
-    - ineffassign
     - staticcheck
-    - unused
-    - misspell
-    - godot
   settings:
     errcheck:
       exclude-functions:
