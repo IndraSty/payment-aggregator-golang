@@ -4,7 +4,7 @@ run:
   timeout: 5m
   go: '1.26'
 
-linters:
+formatters:
   enable:
     - errcheck
     - gosimple
