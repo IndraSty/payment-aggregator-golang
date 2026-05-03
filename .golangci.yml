@@ -20,8 +20,6 @@ linters:
       exclude-functions:
         - fmt.*
         - io/ioutil.*
-
-issues:
   exclusions:
     rules:
       - path: _test\.go
