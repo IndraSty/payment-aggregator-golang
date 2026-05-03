@@ -1,17 +1,20 @@
+version: "2"
+
 run:
   timeout: 5m
 
 linters:
+  default: none
   enable:
-    - errcheck       # check error handling
-    - gosimple       # simplification suggestions
-    - govet          # correctness checks
-    - ineffassign    # detect ineffectual assignments
-    - staticcheck    # static analysis
-    - unused         # detect unused code
-    - gofmt          # formatting
-    - misspell       # spelling mistakes
-    - godot          # comment punctuation
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - gofmt
+    - misspell
+    - godot
 
 linters-settings:
   errcheck:
@@ -19,11 +22,9 @@ linters-settings:
 
 issues:
   exclude-rules:
-    # Ignore errors in test files
     - path: _test\.go
       linters:
         - errcheck
-    # Ignore long lines in migration files
     - path: migrations/
       linters:
         - all
