@@ -1,4 +1,4 @@
-version: "2" 
+version: "2"
 
 run:
   timeout: 5m
@@ -16,11 +16,12 @@ linters:
     - misspell
     - godot
 
-linters-settings:
-  errcheck:
-    exclude-functions:
-      - fmt.*
-      - io/ioutil.*
+linters:
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.*
+        - io/ioutil.*
 
 issues:
   exclusions:
