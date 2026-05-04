@@ -17,7 +17,7 @@ COPY . .
 
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-    -ldflags="-w -s -X main.version=$(git describe --tags --always --dirty)" \
+    -ldflags="-w -s" \
     -o /app/bin/api \
     ./cmd/api/main.go
 
