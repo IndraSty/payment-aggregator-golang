@@ -48,6 +48,11 @@ jobs:
         with:
           go-version: "1.26"
           cache: true
+      
+      - name: Generate swagger docs        
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@latest
+          swag init -g cmd/api/main.go -o ./docs
 
       - name: Download dependencies
         run: go mod download
