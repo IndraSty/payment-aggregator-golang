@@ -32,8 +32,3 @@ go.work.sum
 
 # Air (hot reload)
 tmp/
-
-# Swagger generated docs (regenerate with make swagger)
-docs/docs.go
-docs/swagger.json
-docs/swagger.yaml
