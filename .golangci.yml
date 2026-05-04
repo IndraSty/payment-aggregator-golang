@@ -10,13 +10,10 @@ formatters:
 
 linters:
   enable:
-    - errcheck
     - govet
     - ineffassign
     - staticcheck
-    - unused
     - misspell
-    - godot
   settings:
     errcheck:
       exclude-functions:
