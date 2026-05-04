@@ -59,7 +59,9 @@ func RunMigrations(databaseURL string) error {
 	if err != nil {
 		return fmt.Errorf("failed to init migrate: %w", err)
 	}
-	defer m.Close()
+	defer func() {
+		_, _ = m.Close()
+	}()
 
 	if err := m.Up(); err != nil {
 		// "no change" is not an error — means migrations already applied

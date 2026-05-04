@@ -82,7 +82,7 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to connect to Redis")
 		os.Exit(1)
 	}
-	defer rdb.Close()
+	defer func() { _ = rdb.Close() }()
 
 	// Repositories
 	userRepo := postgres.NewUserRepository(db)

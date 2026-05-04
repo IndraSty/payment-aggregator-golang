@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/http"
 
 	"github.com/IndraSty/payment-aggregator-golang/internal/domain"
@@ -101,10 +100,4 @@ func (crw *capturingResponseWriter) WriteHeader(code int) {
 func (crw *capturingResponseWriter) Write(b []byte) (int, error) {
 	crw.body.Write(b)
 	return crw.ResponseWriter.Write(b)
-}
-
-// isValidJSON checks if bytes are valid JSON — safety check before caching.
-func isValidJSON(b []byte) bool {
-	var js json.RawMessage
-	return json.Unmarshal(b, &js) == nil
 }
