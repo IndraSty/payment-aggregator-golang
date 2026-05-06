@@ -50,52 +50,7 @@ Client → Payment Aggregator → Midtrans  (IDR)
 
 How the system fits together end-to-end — from client request to payment provider and back.
 
-```
-                      ┌─────────────┐
-                      │   Client    │
-                      └──────┬──────┘
-                             │ HTTPS Request
-                             │ + X-Idempotency-Key
-                             │ + Authorization: Bearer
-                      ┌──────▼───────────────────────┐
-                      │     Payment Aggregator        │
-                      │                               │
-                      │  ┌─────────────────────────┐  │
-                      │  │     JWT Middleware       │  │
-                      │  │     Rate Limiter         │  │
-                      │  │     Idempotency Check    │  │
-                      │  └────────────┬────────────┘  │
-                      │               │                │
-                      │  ┌────────────▼────────────┐  │
-                      │  │     Provider Router      │  │
-                      │  │  (currency-based routing)│  │
-                      │  └──┬──────────┬─────────┬─┘  │
-                      └─────┼──────────┼─────────┼────┘
-                            │          │         │
-                   IDR ─────┘    IDR ──┘   USD/EUR
-                   (primary)  (fallback)   (only)
-                            │          │         │
-                   ┌────────▼───┐ ┌────▼────┐ ┌─▼──────┐
-                   │  Midtrans  │ │ Xendit  │ │ Stripe │
-                   │  Sandbox   │ │ Sandbox │ │  Test  │
-                   └────────┬───┘ └────┬────┘ └─┬──────┘
-                            │          │         │
-                            └──────────┼─────────┘
-                                       │ Webhook Callback
-                      ┌────────────────▼──────────────┐
-                      │        Payment Aggregator      │
-                      │    (webhook handler layer)     │
-                      └────────────────┬───────────────┘
-                                       │
-                      ┌────────────────▼───────────────┐
-                      │          Storage Layer          │
-                      │                                 │
-                      │  ┌─────────────┐ ┌──────────┐  │
-                      │  │ PostgreSQL  │ │  Redis   │  │
-                      │  │ (Neon.tech) │ │(Upstash) │  │
-                      │  └─────────────┘ └──────────┘  │
-                      └─────────────────────────────────┘
-```
+![System overflow image](https://github.com/IndraSty/payment-aggregator-golang/blob/main/system-overflow.png)
 
 ### Code Architecture
 
